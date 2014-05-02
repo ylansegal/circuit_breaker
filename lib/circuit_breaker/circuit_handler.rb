@@ -46,11 +46,8 @@ class CircuitBreaker::CircuitHandler
     @excluded_exceptions = DEFAULT_EXCLUDED_EXCEPTIONS
   end
 
-  #
-  # Returns a new CircuitState instance.
-  #
-  def new_circuit_state
-    ::CircuitBreaker::CircuitState.new
+  def circuit_state
+    @circuit_state ||= ::CircuitBreaker::CircuitState.new
   end
 
   #

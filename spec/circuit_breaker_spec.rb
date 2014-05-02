@@ -166,6 +166,17 @@ describe CircuitBreaker do
       @test_object.circuit_state.open?.should be == true
     end
 
+    it 'should fail for objects of the same class' do
+      now = Time.now
+      @test_object.circuit_state.trip!
+      @test_object.circuit_state.last_failure_time = now
+      @test_object.circuit_state.failure_count = 5
+
+      # Should return CircuitBrokenException explicitly
+      lambda { @test_object.call_external_method() }.should raise_error(::CircuitBreaker::CircuitBrokenException)
+      lambda { @test_object.class.new.call_external_method() }.should raise_error(::CircuitBreaker::CircuitBrokenException)
+    end
+
     it 'should not reset the circuit when not enough time has passed' do
       now = Time.now
 

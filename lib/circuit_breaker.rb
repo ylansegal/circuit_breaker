@@ -59,12 +59,8 @@ module CircuitBreaker
     klass.extend ::CircuitBreaker::ClassMethods
   end
 
-  #
-  # Returns the current circuit state.  This is defined on the instance, so
-  # you can have several instances of the same class with different states.
-  #
   def circuit_state
-    @circuit_state ||= self.class.circuit_handler.new_circuit_state
+    self.class.circuit_handler.circuit_state
   end
 
   module ClassMethods

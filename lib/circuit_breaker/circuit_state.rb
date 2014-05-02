@@ -39,6 +39,7 @@ class CircuitBreaker::CircuitState
   end
 
   def initialize()
+    @mutex = Mutex.new
     @failure_count = 0
     @last_failure_time = nil
   end
@@ -48,13 +49,15 @@ class CircuitBreaker::CircuitState
   attr_accessor :failure_count
 
   def increment_failure_count
-    @failure_count = @failure_count + 1
-    @last_failure_time = Time.now
+    @mutex.synchronize do
+      @failure_count = @failure_count + 1
+      @last_failure_time = Time.now
+    end
   end
 
   def reset_failure_count
-    @failure_count = 0
+    @mutex.synchronize do
+      @failure_count = 0
+    end
   end
-
 end
-
