@@ -55,7 +55,7 @@ describe CircuitBreaker do
     # Define what needs to be set for configuration...
     #
     circuit_handler do |handler|
-      handler.logger = Logger.new(STDOUT)
+      # handler.logger = Logger.new(STDOUT)
       handler.failure_threshold = 5
       handler.failure_timeout = 5
       handler.invocation_timeout = 1
