@@ -150,5 +150,4 @@ class CircuitBreaker::CircuitHandler
 
     raise CircuitBreaker::CircuitBrokenException.new("Circuit broken, please wait for timeout", circuit_state)
   end
-
 end

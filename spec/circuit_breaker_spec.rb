@@ -10,7 +10,7 @@ describe CircuitBreaker do
 
    include CircuitBreaker
 
-   def initialize()
+    def initialize()
       @failure = false
     end
 
@@ -66,29 +66,29 @@ describe CircuitBreaker do
 
   before(:each) do
     TestClass.circuit_handler.failure_threshold = 5
-    @test_object = TestClass.new()
+    @test_object = Class.new(TestClass).new
   end
 
   it 'should call second_method and have it run through the circuit breaker' do
     lambda { @test_object.second_method() }.should raise_error("EPIC FAIL")
-    @test_object.circuit_state.closed?.should == true
-    @test_object.circuit_state.failure_count.should == 1
+    @test_object.circuit_state.closed?.should be == true
+    @test_object.circuit_state.failure_count.should be == 1
   end
 
   describe "when closed" do
 
     it "should execute without failing" do
-      @test_object.call_external_method().should == 'hello world!'
-      @test_object.circuit_state.closed?.should == true
-      @test_object.circuit_state.failure_count.should == 0
+      @test_object.call_external_method().should be == 'hello world!'
+      @test_object.circuit_state.closed?.should be == true
+      @test_object.circuit_state.failure_count.should be == 0
     end
 
     it 'should increment the failure count when a failure occurs' do
       @test_object.fail!
 
       lambda { @test_object.call_external_method() }.should raise_error
-      @test_object.circuit_state.closed?.should == true
-      @test_object.circuit_state.failure_count.should == 1
+      @test_object.circuit_state.closed?.should be == true
+      @test_object.circuit_state.failure_count.should be == 1
     end
 
     it 'should trip the circuit when too many failures occur' do
@@ -101,8 +101,8 @@ describe CircuitBreaker do
       lambda { @test_object.call_external_method() }.should raise_error
       lambda { @test_object.call_external_method() }.should raise_error
 
-      @test_object.circuit_state.open?.should == true
-      @test_object.circuit_state.failure_count.should == 6
+      @test_object.circuit_state.open?.should be == true
+      @test_object.circuit_state.failure_count.should be == 6
     end
 
     it 'should reset the failure count if closed after a successful call.' do
@@ -113,8 +113,8 @@ describe CircuitBreaker do
       @test_object.succeed!
       @test_object.call_external_method()
 
-      @test_object.circuit_state.failure_count.should == 0
-      @test_object.circuit_state.closed?.should == true
+      @test_object.circuit_state.failure_count.should be == 0
+      @test_object.circuit_state.closed?.should be == true
     end
 
     it 'should trip immediately when the failure threshold is set to zero' do
@@ -122,14 +122,14 @@ describe CircuitBreaker do
 
       TestClass.circuit_handler.failure_threshold = 0
       lambda { @test_object.call_external_method() }.should raise_error
-      @test_object.circuit_state.open?.should == true
-      @test_object.circuit_state.failure_count.should == 1
+      @test_object.circuit_state.open?.should be == true
+      @test_object.circuit_state.failure_count.should be == 1
     end
 
     it 'should increment the failure count when the method takes too long to return' do
       lambda { @test_object.unresponsive_method }.should raise_error(CircuitBreaker::CircuitBrokenException)
-      @test_object.circuit_state.closed?.should == true
-      @test_object.circuit_state.failure_count.should == 1
+      @test_object.circuit_state.closed?.should be == true
+      @test_object.circuit_state.failure_count.should be == 1
     end
 
     describe "and some exceptions not indicates a circuit problem" do
@@ -137,14 +137,14 @@ describe CircuitBreaker do
         @test_object.fail!
 
         lambda { @test_object.raise_specific_error_method }.should raise_error(SpecificException)
-        @test_object.circuit_state.closed?.should == true
-        @test_object.circuit_state.failure_count.should == 1
+        @test_object.circuit_state.closed?.should be == true
+        @test_object.circuit_state.failure_count.should be == 1
 
         @test_object.succeed!
 
         lambda { @test_object.raise_specific_error_method }.should raise_error(NotFoundException)
-        @test_object.circuit_state.closed?.should == true
-        @test_object.circuit_state.failure_count.should == 1
+        @test_object.circuit_state.closed?.should be == true
+        @test_object.circuit_state.failure_count.should be == 1
       end
     end
 
@@ -162,8 +162,8 @@ describe CircuitBreaker do
       lambda { @test_object.call_external_method() }.should raise_error(::CircuitBreaker::CircuitBrokenException)
 
       # Failure count should not be open
-      @test_object.circuit_state.failure_count.should == 5
-      @test_object.circuit_state.open?.should == true
+      @test_object.circuit_state.failure_count.should be == 5
+      @test_object.circuit_state.open?.should be == true
     end
 
     it 'should not reset the circuit when not enough time has passed' do
@@ -176,8 +176,8 @@ describe CircuitBreaker do
 
       lambda { @test_object.call_external_method() }.should raise_error(::CircuitBreaker::CircuitBrokenException)
 
-      @test_object.circuit_state.failure_count.should == 5
-      @test_object.circuit_state.open?.should == true
+      @test_object.circuit_state.failure_count.should be == 5
+      @test_object.circuit_state.open?.should be == true
     end
 
   end
@@ -196,8 +196,8 @@ describe CircuitBreaker do
       @test_object.call_external_method()
 
       # After a successful call, the failure count is reset.
-      @test_object.circuit_state.failure_count.should == 0
-      @test_object.circuit_state.closed?.should == true
+      @test_object.circuit_state.failure_count.should be == 0
+      @test_object.circuit_state.closed?.should be == true
     end
 
     it 'should trip the circuit immediately if in a half open state' do
@@ -214,10 +214,10 @@ describe CircuitBreaker do
       @test_object.fail!
       lambda { @test_object.call_external_method() }.should raise_error("FAIL")
 
-      @test_object.circuit_state.failure_count.should == 6
+      @test_object.circuit_state.failure_count.should be == 6
 
       # The circuit should immediately pop open again.
-      @test_object.circuit_state.open?.should == true
+      @test_object.circuit_state.open?.should be == true
     end
 
   end
